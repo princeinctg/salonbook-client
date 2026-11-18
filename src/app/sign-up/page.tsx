@@ -62,27 +62,10 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleMock = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Google Customer",
-          email: "customer.google@example.com",
-          image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      toast.success("Signed in with Google!");
-      login(data.token, data.user);
-    } catch (err: any) {
-      toast.error(err.message || "Google sign-in error");
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    const serverUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:5000";
+    const clientReturn = window.location.origin;
+    window.location.href = `${serverUrl}/api/auth/google?returnTo=${encodeURIComponent(clientReturn)}&redirect=/dashboard/customer`;
   };
 
   return (
@@ -113,7 +96,7 @@ export default function SignUpPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Doe"
+                placeholder="Your Name"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#C98573]"
               />
             </div>
@@ -128,7 +111,7 @@ export default function SignUpPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="jane@example.com"
+                placeholder="your.email@example.com"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#C98573]"
               />
             </div>
@@ -209,7 +192,7 @@ export default function SignUpPage() {
         </div>
 
         <button
-          onClick={handleGoogleMock}
+          onClick={handleGoogleSignIn}
           type="button"
           disabled={loading}
           className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-center space-x-2"

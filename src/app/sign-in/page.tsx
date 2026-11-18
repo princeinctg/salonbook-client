@@ -19,6 +19,28 @@ function SignInContent() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Check for Google OAuth callback parameters on page load
+  React.useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      toast.error(decodeURIComponent(errorParam));
+    }
+
+    const tokenParam = searchParams.get("token");
+    const userParam = searchParams.get("user");
+    if (tokenParam && userParam) {
+      try {
+        const parsedUser = JSON.parse(decodeURIComponent(userParam));
+        toast.success("Google authentication successful!");
+        login(tokenParam, parsedUser);
+        const destination = redirect || (parsedUser.role === "admin" ? "/dashboard/admin" : "/dashboard/customer");
+        router.push(destination);
+      } catch (err) {
+        console.error("Failed to parse Google user payload", err);
+      }
+    }
+  }, [searchParams, login, redirect, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,27 +81,12 @@ function SignInContent() {
     setPassword("Admin123");
   };
 
-  const handleGoogleMock = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Verified Google Customer",
-          email: "customer.google@example.com",
-          image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      toast.success("Signed in with Google!");
-      login(data.token, data.user);
-    } catch (err: any) {
-      toast.error(err.message || "Google sign-in error");
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    // Initiate Real Google OAuth 2.0 Flow
+    const serverUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:5000";
+    const clientReturn = window.location.origin;
+    const dest = redirect || "/dashboard/customer";
+    window.location.href = `${serverUrl}/api/auth/google?returnTo=${encodeURIComponent(clientReturn)}&redirect=${encodeURIComponent(dest)}`;
   };
 
   return (
@@ -171,7 +178,7 @@ function SignInContent() {
         </div>
 
         <button
-          onClick={handleGoogleMock}
+          onClick={handleGoogleSignIn}
           type="button"
           disabled={loading}
           className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-center space-x-2"
