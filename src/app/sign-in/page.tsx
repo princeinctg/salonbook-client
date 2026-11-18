@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,25 +18,40 @@ function SignInContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const oauthHandled = useRef(false);
+
+  const isSafeInternalPath = (value: string | null) =>
+    !!value && value.startsWith("/") && !value.startsWith("//");
 
   // Check for Google OAuth callback parameters on page load
   React.useEffect(() => {
     const errorParam = searchParams.get("error");
     if (errorParam) {
-      toast.error(decodeURIComponent(errorParam));
+      toast.error(errorParam);
     }
+
+    if (oauthHandled.current) return;
 
     const tokenParam = searchParams.get("token");
     const userParam = searchParams.get("user");
     if (tokenParam && userParam) {
+      oauthHandled.current = true;
       try {
-        const parsedUser = JSON.parse(decodeURIComponent(userParam));
+        // useSearchParams already URL-decodes the value exactly once.
+        const parsedUser = JSON.parse(userParam);
         toast.success("Google authentication successful!");
+        // Remove the token from the visible URL/history before navigating.
+        window.history.replaceState({}, "", "/sign-in");
         login(tokenParam, parsedUser);
-        const destination = redirect || (parsedUser.role === "admin" ? "/dashboard/admin" : "/dashboard/customer");
-        router.push(destination);
+        const destination = isSafeInternalPath(redirect)
+          ? (redirect as string)
+          : parsedUser.role === "admin"
+          ? "/dashboard/admin"
+          : "/dashboard/customer";
+        router.replace(destination);
       } catch (err) {
         console.error("Failed to parse Google user payload", err);
+        toast.error("Google sign-in could not be completed. Please try again.");
       }
     }
   }, [searchParams, login, redirect, router]);
@@ -61,8 +76,8 @@ function SignInContent() {
       toast.success("Welcome back!");
       login(data.token, data.user);
 
-      if (redirect) {
-        router.push(redirect);
+      if (isSafeInternalPath(redirect)) {
+        router.push(redirect as string);
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to sign in");
@@ -84,9 +99,10 @@ function SignInContent() {
   const handleGoogleSignIn = () => {
     // Initiate Real Google OAuth 2.0 Flow
     const serverUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:5000";
-    const clientReturn = window.location.origin;
-    const dest = redirect || "/dashboard/customer";
-    window.location.href = `${serverUrl}/api/auth/google?returnTo=${encodeURIComponent(clientReturn)}&redirect=${encodeURIComponent(dest)}`;
+    const params = new URLSearchParams({ returnTo: window.location.origin });
+    // Let the API pick the role-based dashboard unless a safe path was requested.
+    if (isSafeInternalPath(redirect)) params.set("redirect", redirect as string);
+    window.location.href = `${serverUrl}/api/auth/google?${params.toString()}`;
   };
 
   return (

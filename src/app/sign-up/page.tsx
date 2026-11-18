@@ -64,8 +64,8 @@ export default function SignUpPage() {
 
   const handleGoogleSignIn = () => {
     const serverUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:5000";
-    const clientReturn = window.location.origin;
-    window.location.href = `${serverUrl}/api/auth/google?returnTo=${encodeURIComponent(clientReturn)}&redirect=/dashboard/customer`;
+    const params = new URLSearchParams({ returnTo: window.location.origin });
+    window.location.href = `${serverUrl}/api/auth/google?${params.toString()}`;
   };
 
   return (
