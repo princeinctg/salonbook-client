@@ -57,4 +57,4 @@ NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_client_api_key
 ## Repositories & Deployment Links
 - **Client Repository**: https://github.com/princeinctg/salonbook-client
 - **Server Repository**: https://github.com/princeinctg/salonbook-server
-- **Live Deployment**: Vercel
+- **Live Deployment**: https://salonbook-client.vercel.app/
