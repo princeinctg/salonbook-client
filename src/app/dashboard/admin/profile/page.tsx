@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -20,7 +22,7 @@ export default function AdminProfilePage() {
 
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/profile`, {
+      const res = await fetch(`${getApiBaseUrl()}/auth/profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

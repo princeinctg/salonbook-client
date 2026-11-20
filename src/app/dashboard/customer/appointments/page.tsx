@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +18,7 @@ export default function CustomerAppointmentsPage() {
   const loadAppointments = async () => {
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/appointments/my`, {
+      const res = await fetch(`${getApiBaseUrl()}/appointments/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -41,7 +43,7 @@ export default function CustomerAppointmentsPage() {
     setActionLoading(id);
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/appointments/${id}/cancel`, {
+      const res = await fetch(`${getApiBaseUrl()}/appointments/${id}/cancel`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,7 +63,7 @@ export default function CustomerAppointmentsPage() {
     setActionLoading(id);
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/payments/create-checkout-session`, {
+      const res = await fetch(`${getApiBaseUrl()}/payments/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

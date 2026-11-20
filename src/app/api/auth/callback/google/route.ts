@@ -1,17 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
+import { PRODUCTION_SERVER_URL } from "@/lib/config";
 
 // Google redirects here because this exact URL is the Authorized redirect URI
 // registered for the OAuth client in Google Cloud Console. The authorization
 // code is then handed to the Express API, which performs the token exchange.
 export const dynamic = "force-dynamic";
 
+function trimTrailingSlashes(value: string): string {
+  return value.replace(/\/+$/, "");
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname === "[::1]"
+  );
+}
+
+function isLoopbackUrl(value: string): boolean {
+  try {
+    return isLoopbackHost(new URL(value).hostname);
+  } catch {
+    return false;
+  }
+}
+
 function getServerBaseUrl(): string {
+  const isProduction = process.env.NODE_ENV === "production";
   const explicit =
     process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
-  if (explicit) return explicit.replace(/\/+$/, "");
+  const value = explicit?.trim();
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-  return apiUrl.replace(/\/api\/?$/, "").replace(/\/+$/, "") || "http://localhost:5000";
+  // A localhost value must never be used by a deployed Vercel runtime.
+  if (value && !(isProduction && isLoopbackUrl(value))) {
+    return trimTrailingSlashes(value);
+  }
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (apiUrl && !(isProduction && isLoopbackUrl(apiUrl))) {
+    return trimTrailingSlashes(apiUrl.replace(/\/api\/?$/, ""));
+  }
+
+  return isProduction ? PRODUCTION_SERVER_URL : "http://localhost:5000";
 }
 
 export async function GET(request: NextRequest) {

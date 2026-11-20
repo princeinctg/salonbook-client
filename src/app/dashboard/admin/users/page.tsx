@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -13,7 +15,7 @@ export default function AdminUsersPage() {
   const loadUsers = async () => {
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/dashboard/admin/users`, {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -37,7 +39,7 @@ export default function AdminUsersPage() {
 
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/dashboard/admin/users/${id}/block`, {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard/admin/users/${id}/block`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

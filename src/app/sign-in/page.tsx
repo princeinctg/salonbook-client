@@ -1,5 +1,6 @@
 "use client";
 
+import { getApiBaseUrl, getGoogleAuthUrl } from "@/lib/config";
 import React, { useState, Suspense, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -61,7 +62,7 @@ function SignInContent() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/signin`, {
+      const res = await fetch(`${getApiBaseUrl()}/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -97,12 +98,12 @@ function SignInContent() {
   };
 
   const handleGoogleSignIn = () => {
-    // Initiate Real Google OAuth 2.0 Flow
-    const serverUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:5000";
-    const params = new URLSearchParams({ returnTo: window.location.origin });
+    // Initiate Real Google OAuth 2.0 Flow against the deployed API.
     // Let the API pick the role-based dashboard unless a safe path was requested.
-    if (isSafeInternalPath(redirect)) params.set("redirect", redirect as string);
-    window.location.href = `${serverUrl}/api/auth/google?${params.toString()}`;
+    window.location.href = getGoogleAuthUrl({
+      returnTo: window.location.origin,
+      redirect: isSafeInternalPath(redirect) ? (redirect as string) : undefined,
+    });
   };
 
   return (

@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -80,7 +82,7 @@ export default function AddServicePage() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services`, {
+      const res = await fetch(`${getApiBaseUrl()}/services`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

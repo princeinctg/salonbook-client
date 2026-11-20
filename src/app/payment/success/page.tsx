@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -26,7 +28,7 @@ function PaymentSuccessContent() {
 
         // If mock session, trigger simulated webhook/success verification
         if (sessionId && sessionId.startsWith("cs_test_mock")) {
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/payments/simulate-success`, {
+          await fetch(`${getApiBaseUrl()}/payments/simulate-success`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -37,7 +39,7 @@ function PaymentSuccessContent() {
         }
 
         // Fetch refreshed appointment
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/appointments/${appointmentId}`, {
+        const res = await fetch(`${getApiBaseUrl()}/appointments/${appointmentId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

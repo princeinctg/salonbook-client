@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -32,7 +34,7 @@ function BrowseServicesContent() {
   useEffect(() => {
     async function fetchServices() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services`);
+        const res = await fetch(`${getApiBaseUrl()}/services`);
         if (res.ok) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {

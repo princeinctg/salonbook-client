@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -15,7 +17,7 @@ export default function AdminServicesPage() {
   const loadServices = async () => {
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services/admin/all`, {
+      const res = await fetch(`${getApiBaseUrl()}/services/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -37,7 +39,7 @@ export default function AdminServicesPage() {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services/${id}`, {
+      const res = await fetch(`${getApiBaseUrl()}/services/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +59,7 @@ export default function AdminServicesPage() {
     if (!confirm("Are you sure you want to permanently delete this service?")) return;
     try {
       const token = localStorage.getItem("salonbook_token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services/${id}`, {
+      const res = await fetch(`${getApiBaseUrl()}/services/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

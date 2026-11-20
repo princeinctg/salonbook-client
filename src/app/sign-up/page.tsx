@@ -1,5 +1,6 @@
 "use client";
 
+import { getApiBaseUrl, getGoogleAuthUrl } from "@/lib/config";
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,7 +36,7 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/signup`, {
+      const res = await fetch(`${getApiBaseUrl()}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -63,9 +64,11 @@ export default function SignUpPage() {
   };
 
   const handleGoogleSignIn = () => {
-    const serverUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:5000";
-    const params = new URLSearchParams({ returnTo: window.location.origin });
-    window.location.href = `${serverUrl}/api/auth/google?${params.toString()}`;
+    // Always use the deployed API in production; never fall back to localhost.
+    window.location.href = getGoogleAuthUrl({
+      returnTo: window.location.origin,
+      redirect: "/dashboard/customer",
+    });
   };
 
   return (

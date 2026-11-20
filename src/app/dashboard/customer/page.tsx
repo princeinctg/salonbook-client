@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -21,7 +23,7 @@ export default function CustomerDashboardPage() {
     async function loadStats() {
       try {
         const token = localStorage.getItem("salonbook_token");
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/dashboard/customer`, {
+        const res = await fetch(`${getApiBaseUrl()}/dashboard/customer`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,7 +37,7 @@ export default function HomePage() {
   useEffect(() => {
     async function loadServices() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services`);
+        const res = await fetch(`${getApiBaseUrl()}/services`);
         if (res.ok) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {

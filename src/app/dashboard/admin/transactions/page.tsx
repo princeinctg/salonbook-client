@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { CreditCard, Calendar, CheckCircle2 } from "lucide-react";
@@ -13,7 +15,7 @@ export default function AdminTransactionsPage() {
     async function loadTransactions() {
       try {
         const token = localStorage.getItem("salonbook_token");
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/dashboard/admin/transactions`, {
+        const res = await fetch(`${getApiBaseUrl()}/dashboard/admin/transactions`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

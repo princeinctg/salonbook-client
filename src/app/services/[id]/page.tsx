@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiBaseUrl } from "@/lib/config";
+
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -42,7 +44,7 @@ export default function ServiceDetailsPage() {
   useEffect(() => {
     async function loadService() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/services/${id}`);
+        const res = await fetch(`${getApiBaseUrl()}/services/${id}`);
         if (res.ok) {
           const json = await res.json();
           setService(json.data);
@@ -91,7 +93,7 @@ export default function ServiceDetailsPage() {
     setBookingLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/appointments`, {
+      const res = await fetch(`${getApiBaseUrl()}/appointments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
